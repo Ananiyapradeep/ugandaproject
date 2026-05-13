@@ -1739,10 +1739,12 @@ overflow:hidden;
 <div id="page-main">
 <!-- VIDEO BACKGROUND -->
 <div class="video-bg">
-  <video autoplay muted loop playsinline id="mainBgVideo">
+  <video autoplay muted loop playsinline>
     <source src="bg-video.mp4" type="video/mp4">
   </video>
 </div>
+
+<div class="video-overlay"></div>
 
 <div class="video-overlay"></div>
 <!-- NAV -->
@@ -2596,15 +2598,23 @@ let API_TOKEN  = null;
 let API_USER   = null;
 
 // ── Status bar helpers ──────────────────────────────────────
-function apiStatusShow(msg, color='#c89b3c'){
-  const bar  = document.getElementById('apiStatusBar');
-  const dot  = document.getElementById('apiStatusDot');
-  const text = document.getElementById('apiStatusText');
-  if(!bar) return;
-  dot.style.background = color;
-  dot.style.boxShadow  = `0 0 0 2px ${color}44`;
-  text.textContent     = msg;
-  bar.style.transform  = 'translateY(0)';
+function apiStatusShow(message, success = true) {
+
+    const statusEl = document.getElementById('apiStatus');
+
+    if (!statusEl) {
+        console.log(message);
+        return;
+    }
+
+    statusEl.style.display = 'block';
+    statusEl.innerText = message;
+
+    if(success){
+        statusEl.style.color = 'lime';
+    } else {
+        statusEl.style.color = 'red';
+    }
 }
 function apiStatusHide(delay=3000){
   setTimeout(() => {
@@ -2810,7 +2820,8 @@ function buildBookingPayload(data){
     vehicle_pass     : data.vehicleEnabled,
     total_amount_usd : data.total,
     currency         : 'USD',
-    payment_status   : 'pending',
+    payment_status: 'paid',
+status: 'confirmed',
     booking_reference: data.bookingId
   };
 }
@@ -3809,7 +3820,6 @@ async function sendOTP(){
   } else {
     document.getElementById('lfMsg2').innerHTML =
       `<div class="lf-msg info">A 6-digit OTP has been sent to <strong>${identifier}</strong>.
-       <div style="margin-top:.5rem; font-size:.75rem; color:rgba(14,26,20,.55);">Demo mode — your OTP is:
          <strong style="font-family:var(--serif);font-size:1.1rem;color:var(--moss);margin-left:.3rem;">${generatedOTP}</strong>
        </div></div>`;
   }
@@ -4683,9 +4693,64 @@ function initiateRazorpay(){
         visit_date: bookingData.visitDate
       },
       theme: { color: '#c89b3c' },
-      handler: function(response){
+    
+
+
+
+
+handler: async function (response) {
+
+    try {
+
+        const saveBooking = {
+            booking_id: bookingData.bookingId,
+            park_name: bookingData.park?.name || "",
+            visit_date: bookingData.visitDate || "",
+            entry_time: bookingData.visitTime || "",
+
+            booking_holder: {
+                full_name: bookingData.holderName || "",
+                email: bookingData.email || "",
+                phone_number: bookingData.phone || "",
+                id_type: bookingData.idType || "passport"
+            },
+
+            total_amount_usd: bookingData.total || 0,
+            payment_status: "paid",
+            status: "confirmed",
+            payment_id: response.razorpay_payment_id,
+            booking_reference: bookingData.bookingId
+        };
+
+        const apiResponse = await fetch("http://localhost:3000/api/v1/bookings", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(saveBooking)
+        });
+
+        const result = await apiResponse.json();
+
+        console.log("Booking Saved:", result);
+
         showPaymentSuccess(response.razorpay_payment_id);
-      },
+
+    } catch(error){
+
+        console.error("Booking API Error:", error);
+
+    }
+
+},
+
+
+
+
+
+
+
+
       modal: {
         ondismiss: function(){
           btn.disabled = false;
@@ -4693,40 +4758,96 @@ function initiateRazorpay(){
           showToast('Payment Cancelled', 'You closed the payment window.');
         }
       }
+
     };
+
     setTimeout(() => {
+
       const rzp = new Razorpay(options);
+
       rzp.on('payment.failed', function(r){
+
         btn.disabled = false;
+
         btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Retry Payment`;
+
         showToast('Payment Failed', r.error.description || 'Please try again.');
+
       });
+
       rzp.open();
+
     }, 600);
+
   } else {
-    // ── Demo simulation (no real key configured) ──
+
     simulatePaymentDemo(btn);
+
   }
+
 }
 
 function simulatePaymentDemo(btn){
-  // Step 1: show "processing" overlay
+
+  // Step 1: show processing overlay
   document.getElementById('payProcessingOverlay').classList.add('show');
 
   setTimeout(() => {
-    // Step 2: hide processing, show success
+
+    // Step 2: hide processing overlay
     document.getElementById('payProcessingOverlay').classList.remove('show');
+
     const txnId = 'TXN-DEMO-' + Date.now().toString(36).toUpperCase();
-    showPaymentSuccess(txnId);
 
-    // Re-enable button in background
-    if(btn){
-      btn.disabled = false;
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Pay $${bookingData.total.toLocaleString()} Securely`;
-    }
+    const saveBooking = {
+      booking_id: bookingData.bookingId,
+      park_name: bookingData.park?.name || "",
+      visit_date: bookingData.visitDate || "",
+      entry_time: bookingData.visitTime || "",
+
+      booking_holder: {
+        full_name: bookingData.holderName || "",
+        email: bookingData.email || "",
+        phone_number: bookingData.phone || "",
+        id_type: bookingData.idType || "passport"
+      },
+
+      total_amount_usd: bookingData.total || 0,
+      payment_status: "paid",
+      status: "confirmed",
+      payment_id: txnId,
+      booking_reference: bookingData.bookingId
+    };
+
+    fetch("http://localhost:3000/api/v1/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(saveBooking)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+      console.log("Demo Booking Saved:", data);
+
+      showPaymentSuccess(txnId);
+
+      if(btn){
+        btn.disabled = false;
+        btn.innerHTML = `Pay $${bookingData.total.toLocaleString()} Securely`;
+      }
+
+    })
+    .catch(err => {
+
+      console.error("Demo Booking Error:", err);
+
+    });
+
   }, 2000);
-}
 
+}
 function showPaymentSuccess(txnId){
   document.getElementById('paySuccessId').textContent = txnId;
   document.getElementById('paySuccessOverlay').classList.add('show');
