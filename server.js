@@ -13,6 +13,11 @@ const crypto   = require('crypto');
 
 const twilio = require('twilio');
 
+
+app.use(cors({
+  origin: "https://ugandaproject.vercel.app"
+}));git add .
+
 const client = twilio(
    'AC63b9ff17fbad81d8d0635917b581a972',
    'e503c1291f7f803e183fc604e8aa2035'
