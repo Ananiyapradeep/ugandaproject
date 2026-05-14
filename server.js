@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
   origin: "https://ugandaproject.vercel.app"
 }));
+
 const client = twilio(
    'AC63b9ff17fbad81d8d0635917b581a972',
    'e503c1291f7f803e183fc604e8aa2035'
@@ -26,8 +27,6 @@ const client = twilio(
 
 const serviceSid = 'VAf9382c98255a39552bccaf7710cd018f';
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
 
 // ── In-memory stores ──────────────────────────────────────────
 const users    = {};   // identifier → user object
