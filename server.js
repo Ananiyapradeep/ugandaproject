@@ -16,7 +16,7 @@ const twilio = require('twilio');
 
 app.use(cors({
   origin: "https://ugandaproject.vercel.app"
-}));git add .
+}));
 
 const client = twilio(
    'AC63b9ff17fbad81d8d0635917b581a972',
@@ -385,32 +385,39 @@ app.get('/health', (req, res) => {
 otp_mode : 'Twilio Verify SMS',  });
 });
 
+
+
+
+
+
+
+module.exports = app;
 // ══════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
 
-  const otpMode = 'Twilio Verify SMS';
+//   const otpMode = 'Twilio Verify SMS';
 
-  console.log('');
+//   console.log('');
 
-  console.log('  ╔══════════════════════════════════════════════╗');
-  console.log('  ║   Uganda Wildlife Sanctuary — WildEye API   ║');
-  console.log('  ╠══════════════════════════════════════════════╣');
+//   console.log('  ╔══════════════════════════════════════════════╗');
+//   console.log('  ║   Uganda Wildlife Sanctuary — WildEye API   ║');
+//   console.log('  ╠══════════════════════════════════════════════╣');
 
-  console.log(`  ║  App       →  http://localhost:${PORT}            ║`);
-  console.log(`  ║  Admin     →  http://localhost:${PORT}/admin       ║`);
-  console.log(`  ║  API Docs  →  http://localhost:${PORT}/docs        ║`);
-  console.log(`  ║  Health    →  http://localhost:${PORT}/health      ║`);
+//   console.log(`  ║  App       →  http://localhost:${PORT}            ║`);
+//   console.log(`  ║  Admin     →  http://localhost:${PORT}/admin       ║`);
+//   console.log(`  ║  API Docs  →  http://localhost:${PORT}/docs        ║`);
+//   console.log(`  ║  Health    →  http://localhost:${PORT}/health      ║`);
 
-  console.log(`  ║  OTP Mode  →  ${otpMode.padEnd(30)}║`);
+//   console.log(`  ║  OTP Mode  →  ${otpMode.padEnd(30)}║`);
 
-  console.log('  ╠══════════════════════════════════════════════╣');
+//   console.log('  ╠══════════════════════════════════════════════╣');
 
-  console.log(`  ║  Admin token: ${CONFIG.ADMIN_SECRET.padEnd(29)}║`);
+//   console.log(`  ║  Admin token: ${CONFIG.ADMIN_SECRET.padEnd(29)}║`);
 
-  console.log('  ╚══════════════════════════════════════════════╝');
+//   console.log('  ╚══════════════════════════════════════════════╝');
 
-  console.log('');
+//   console.log('');
 
-});
+// });
