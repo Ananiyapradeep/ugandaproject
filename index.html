@@ -4722,7 +4722,7 @@ handler: async function (response) {
             booking_reference: bookingData.bookingId
         };
 
-        const apiResponse = await fetch("http://localhost:3000/api/v1/bookings", {
+        const apiResponse = await fetch("/api/v1/bookings", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -4769,54 +4769,54 @@ handler: async function (response) {
 
 
 
-const options = {
+// const options = {
 
-  key: "YOUR_KEY",
+//   key: "YOUR_KEY",
 
-  amount: totalPrice * 100,
+//   amount: totalPrice * 100,
 
-  currency: "INR",
+//   currency: "INR",
 
-  name: "Uganda Wildlife",
+//   name: "Uganda Wildlife",
 
-  handler: async function (response) {
+//   handler: async function (response) {
 
-    try {
+//     try {
 
-      console.log("Payment Success:", response);
+//       console.log("Payment Success:", response);
 
-      const bookingResponse = await fetch('/api/v1/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          park_name: selectedPark.name,
-          total_amount_usd: totalPrice,
-          payment_id: response.razorpay_payment_id,
-          payment_status: 'paid'
-        })
-      });
+//       const bookingResponse = await fetch('/api/v1/bookings', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//           park_name: selectedPark.name,
+//           total_amount_usd: totalPrice,
+//           payment_id: response.razorpay_payment_id,
+//           payment_status: 'paid'
+//         })
+//       });
 
-      const data = await bookingResponse.json();
+//       const data = await bookingResponse.json();
 
-      console.log(data);
+//       console.log(data);
 
-      alert("Booking Confirmed!");
+//       alert("Booking Confirmed!");
 
-      window.location.href = "/";
+//       window.location.href = "/";
 
-    } catch(err) {
+//     } catch(err) {
 
-      console.log(err);
+//       console.log(err);
 
-      alert("Booking failed");
+//       alert("Booking failed");
 
-    }
+//     }
 
-  }
+//   }
 
-};
+// };
 
 
 
