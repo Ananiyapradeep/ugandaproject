@@ -21,11 +21,11 @@ app.use(cors({
 }));
 
 const client = twilio(
-   'AC63b9ff17fbad81d8d0635917b581a972',
-   'e503c1291f7f803e183fc604e8aa2035'
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
 );
 
-const serviceSid = 'VAf9382c98255a39552bccaf7710cd018f';
+const serviceSid = process.env.TWILIO_SERVICE_SID;
 
 
 // ── In-memory stores ──────────────────────────────────────────
