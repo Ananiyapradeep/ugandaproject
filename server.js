@@ -6,6 +6,13 @@
  * Admin Dashboard API included
  */
 
+require('dotenv').config();
+
+const { Sequelize, DataTypes } = require('sequelize');
+
+
+
+
 const express  = require('express');
 const cors     = require('cors');
 const path     = require('path');
@@ -15,6 +22,85 @@ const twilio = require('twilio');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
+});
+
+sequelize.authenticate()
+.then(() => {
+  console.log('PostgreSQL Connected');
+})
+.catch((err) => {
+  console.log(err);
+});
+
+
+
+
+const Booking = sequelize.define('Booking', {
+
+  booking_id: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+
+  park_name: DataTypes.STRING,
+
+  visit_date: DataTypes.STRING,
+
+  entry_time: DataTypes.STRING,
+
+  full_name: DataTypes.STRING,
+
+  email: DataTypes.STRING,
+
+  phone_number: DataTypes.STRING,
+
+  total_amount_usd: DataTypes.FLOAT,
+
+  payment_status: DataTypes.STRING,
+
+  status: DataTypes.STRING,
+
+  payment_id: DataTypes.STRING,
+
+  booking_reference: DataTypes.STRING
+
+});
+
+
+sequelize.sync({ alter: true })
+.then(() => {
+  console.log('Database Synced');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.use(cors({
   origin: "https://ugandaproject.vercel.app"
@@ -216,23 +302,58 @@ app.post('/api/v1/auth/register', (req, res) => {
 // ══════════════════════════════════════════════════════════════
 
 // POST /api/v1/bookings
-app.post('/api/v1/bookings', (req, res) => {
-  const data = req.body;
-  const id   = 'WE-' + Date.now().toString(36).toUpperCase() + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+app.post('/api/v1/bookings', async (req, res) => {
 
-  const booking = {
-    booking_id     : id,
-    id,
-    ...data,
-    status         : 'confirmed',
-    payment_status : 'paid',
-    created_at     : new Date().toISOString(),
-  };
-  bookings[id] = booking;
-  if (data.booking_reference) bookings[data.booking_reference] = booking;
+  try {
 
-  console.log(`[BOOKING] ✓ Created: ${id} — ${data.park_name || '?'} — $${data.total_amount_inr || 0}`);
-  res.status(201).json({ success: true, booking_id: id, id, booking });
+    const data = req.body;
+
+    const id = 'WE-' + Date.now().toString(36).toUpperCase();
+
+    const booking = await Booking.create({
+
+      booking_id: id,
+
+      park_name: data.park_name,
+
+      visit_date: data.visit_date,
+
+      entry_time: data.entry_time,
+
+      full_name: data.booking_holder?.full_name,
+
+      email: data.booking_holder?.email,
+
+      phone_number: data.booking_holder?.phone_number,
+
+      total_amount_usd: data.total_amount_usd,
+
+      payment_status: data.payment_status,
+
+      status: data.status,
+
+      payment_id: data.payment_id,
+
+      booking_reference: data.booking_reference
+
+    });
+
+    res.status(201).json({
+      success: true,
+      booking
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
+
 });
 
 // GET /api/v1/bookings/:id

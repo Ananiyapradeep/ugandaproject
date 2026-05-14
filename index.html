@@ -4876,7 +4876,7 @@ function simulatePaymentDemo(btn){
       booking_reference: bookingData.bookingId
     };
 
-    fetch("http://localhost:3000/api/v1/bookings", {
+    fetch("/api/v1/bookings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

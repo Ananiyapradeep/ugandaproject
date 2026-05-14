@@ -21,9 +21,12 @@
   "homepage": "https://github.com/krisshna12/ugandaa#readme",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "sequelize": "^6.37.8",
     "twilio": "^6.0.2"
   }
 }
