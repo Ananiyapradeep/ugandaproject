@@ -4700,47 +4700,41 @@ function initiateRazorpay(){
 
 handler: async function (response) {
 
-    try {
+  try {
 
-        const saveBooking = {
-            booking_id: bookingData.bookingId,
-            park_name: bookingData.park?.name || "",
-            visit_date: bookingData.visitDate || "",
-            entry_time: bookingData.visitTime || "",
+    alert("Payment Successful");
 
-            booking_holder: {
-                full_name: bookingData.holderName || "",
-                email: bookingData.email || "",
-                phone_number: bookingData.phone || "",
-                id_type: bookingData.idType || "passport"
-            },
+    console.log("Razorpay Response:", response);
 
-            total_amount_usd: bookingData.total || 0,
-            payment_status: "paid",
-            status: "confirmed",
-            payment_id: response.razorpay_payment_id,
-            booking_reference: bookingData.bookingId
-        };
+    const saveBooking = {
+      booking_id: bookingData.bookingId,
+      park_name: bookingData.park?.name || "",
+      visit_date: bookingData.visitDate || "",
+      entry_time: bookingData.visitTime || "",
+      total_amount_usd: bookingData.total || 0,
+      payment_status: "paid",
+      status: "confirmed",
+      payment_id: response.razorpay_payment_id,
+      booking_reference: bookingData.bookingId
+    };
 
-        const apiResponse = await fetch("/api/v1/bookings", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(saveBooking)
-        });
+    await fetch("/api/v1/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(saveBooking)
+    });
 
-        const result = await apiResponse.json();
+    window.location.href = "/";
 
-        console.log("Booking Saved:", result);
+  } catch(error){
 
-        showPaymentSuccess(response.razorpay_payment_id);
+    console.log(error);
 
-    } catch(error){
+    alert("Booking Save Failed");
 
-        console.error("Booking API Error:", error);
-
-    }
+  }
 
 },
 
@@ -4767,56 +4761,6 @@ handler: async function (response) {
 
 
 
-
-
-// const options = {
-
-//   key: "YOUR_KEY",
-
-//   amount: totalPrice * 100,
-
-//   currency: "INR",
-
-//   name: "Uganda Wildlife",
-
-//   handler: async function (response) {
-
-//     try {
-
-//       console.log("Payment Success:", response);
-
-//       const bookingResponse = await fetch('/api/v1/bookings', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//           park_name: selectedPark.name,
-//           total_amount_usd: totalPrice,
-//           payment_id: response.razorpay_payment_id,
-//           payment_status: 'paid'
-//         })
-//       });
-
-//       const data = await bookingResponse.json();
-
-//       console.log(data);
-
-//       alert("Booking Confirmed!");
-
-//       window.location.href = "/";
-
-//     } catch(err) {
-
-//       console.log(err);
-
-//       alert("Booking failed");
-
-//     }
-
-//   }
-
-// };
 
 
 
