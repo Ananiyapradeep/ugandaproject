@@ -4765,6 +4765,63 @@ handler: async function (response) {
 
       const rzp = new Razorpay(options);
 
+
+
+
+
+const options = {
+
+  key: "YOUR_KEY",
+
+  amount: totalPrice * 100,
+
+  currency: "INR",
+
+  name: "Uganda Wildlife",
+
+  handler: async function (response) {
+
+    try {
+
+      console.log("Payment Success:", response);
+
+      const bookingResponse = await fetch('/api/v1/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          park_name: selectedPark.name,
+          total_amount_usd: totalPrice,
+          payment_id: response.razorpay_payment_id,
+          payment_status: 'paid'
+        })
+      });
+
+      const data = await bookingResponse.json();
+
+      console.log(data);
+
+      alert("Booking Confirmed!");
+
+      window.location.href = "/";
+
+    } catch(err) {
+
+      console.log(err);
+
+      alert("Booking failed");
+
+    }
+
+  }
+
+};
+
+
+
+
+
       rzp.on('payment.failed', function(r){
 
         btn.disabled = false;
