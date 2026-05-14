@@ -6,7 +6,7 @@
  * Admin Dashboard API included
  */
 
-
+require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize');
 
 
@@ -23,7 +23,11 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL missing");
+}
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {  
   dialect: 'postgres',
   protocol: 'postgres',
   dialectOptions: {
@@ -508,6 +512,15 @@ otp_mode : 'Twilio Verify SMS',  });
 
 if (process.env.NODE_ENV !== 'production') {
 
+
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    message: "Server Running"
+  });
+});
+
+  
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
@@ -521,34 +534,5 @@ module.exports = app;
 
 
 
-
-
-// ══════════════════════════════════════════════════════════════
-// START
-// ══════════════════════════════════════════════════════════════
-// app.listen(PORT, () => {
-
-//   const otpMode = 'Twilio Verify SMS';
-
-//   console.log('');
-
-//   console.log('  ╔══════════════════════════════════════════════╗');
-//   console.log('  ║   Uganda Wildlife Sanctuary — WildEye API   ║');
-//   console.log('  ╠══════════════════════════════════════════════╣');
-
-//   console.log(`  ║  App       →  http://localhost:${PORT}            ║`);
-//   console.log(`  ║  Admin     →  http://localhost:${PORT}/admin       ║`);
-//   console.log(`  ║  API Docs  →  http://localhost:${PORT}/docs        ║`);
-//   console.log(`  ║  Health    →  http://localhost:${PORT}/health      ║`);
-
-//   console.log(`  ║  OTP Mode  →  ${otpMode.padEnd(30)}║`);
-
-//   console.log('  ╠══════════════════════════════════════════════╣');
-
-//   console.log(`  ║  Admin token: ${CONFIG.ADMIN_SECRET.padEnd(29)}║`);
-
-//   console.log('  ╚══════════════════════════════════════════════╝');
-
-//   console.log('');
 
 // });
