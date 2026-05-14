@@ -6,7 +6,6 @@
  * Admin Dashboard API included
  */
 
-require('dotenv').config();
 
 const { Sequelize, DataTypes } = require('sequelize');
 
@@ -520,7 +519,7 @@ module.exports = app;
 
 
 
-// module.exports = app;
+
 
 
 
