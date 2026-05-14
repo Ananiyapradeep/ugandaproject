@@ -3,22 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "commonjs",
+
+  "engines": {
+    "node": "20.x"
+  },
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/krisshna12/ugandaa.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/krisshna12/ugandaa/issues"
-  },
-  "homepage": "https://github.com/krisshna12/ugandaa#readme",
+
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -26,6 +20,7 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^8.0.7",
     "pg": "^8.20.0",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
     "twilio": "^6.0.2"
   }
