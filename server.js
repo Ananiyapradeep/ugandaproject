@@ -231,7 +231,7 @@ app.post('/api/v1/bookings', (req, res) => {
   bookings[id] = booking;
   if (data.booking_reference) bookings[data.booking_reference] = booking;
 
-  console.log(`[BOOKING] ✓ Created: ${id} — ${data.park_name || '?'} — $${data.total_amount_usd || 0}`);
+  console.log(`[BOOKING] ✓ Created: ${id} — ${data.park_name || '?'} — $${data.total_amount_inr || 0}`);
   res.status(201).json({ success: true, booking_id: id, id, booking });
 });
 
@@ -277,7 +277,7 @@ app.post('/api/v1/payments/confirm', (req, res) => {
     booking.payment_status = status || 'paid';
     booking.payment_id     = payment_id;
     booking.amount_paid    = amount_paid;
-    booking.currency       = currency || 'USD';
+    booking.currency       = currency || 'INR';
     booking.paid_at        = new Date().toISOString();
     booking.status         = 'confirmed';
   }
@@ -303,7 +303,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
   const cancelled  = deduped.filter(b => b.status === 'cancelled');
   const paid       = deduped.filter(b => b.payment_status === 'paid');
 
-  const totalRevenue = paid.reduce((s, b) => s + (Number(b.total_amount_usd) || Number(b.amount_paid) || 0), 0);
+  const totalRevenue = paid.reduce((s, b) => s + (Number(b.total_amount_inr) || Number(b.amount_paid) || 0), 0);
 
   // Park breakdown
   const parkMap = {};
@@ -311,7 +311,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
     const p = b.park_name || 'Unknown';
     if (!parkMap[p]) parkMap[p] = { count: 0, revenue: 0 };
     parkMap[p].count++;
-    if (b.payment_status === 'paid') parkMap[p].revenue += Number(b.total_amount_usd) || Number(b.amount_paid) || 0;
+    if (b.payment_status === 'paid') parkMap[p].revenue += Number(b.total_amount_inr) || Number(b.amount_paid) || 0;
   });
 
   // Daily bookings (last 30 days)
@@ -321,7 +321,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
     if (!day) return;
     if (!dailyMap[day]) dailyMap[day] = { bookings: 0, revenue: 0 };
     dailyMap[day].bookings++;
-    if (b.payment_status === 'paid') dailyMap[day].revenue += Number(b.total_amount_usd) || Number(b.amount_paid) || 0;
+    if (b.payment_status === 'paid') dailyMap[day].revenue += Number(b.total_amount_inr) || Number(b.amount_paid) || 0;
   });
 
   // Recent bookings (last 10)
@@ -334,7 +334,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
       holder_name    : b.booking_holder?.full_name || '—',
       email          : b.booking_holder?.email || '—',
       phone          : b.booking_holder?.phone_number || '—',
-      total_usd      : b.total_amount_usd || b.amount_paid || 0,
+      total_inr      : b.total_amount_inr || b.amount_paid || 0,
       status         : b.status,
       payment_status : b.payment_status,
       visit_date     : b.visit_date,
@@ -348,7 +348,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
       confirmed         : confirmed.length,
       cancelled         : cancelled.length,
       paid              : paid.length,
-      total_revenue_usd : Math.round(totalRevenue * 100) / 100,
+      total_revenue_inr : Math.round(totalRevenue * 100) / 100,
       total_users       : Object.keys(users).length,
     },
     parks        : Object.entries(parkMap).map(([name, d]) => ({ name, ...d })).sort((a,b) => b.count - a.count),
