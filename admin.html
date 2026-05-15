@@ -956,7 +956,7 @@ async function renderUsersTable() {
   allBookings.forEach(b => {
     const h = b.booking_holder || {};
     const k = h.email || h.phone_number || h.full_name;
-    if (k && !seen[k]) seen[k] = { name: h.full_name, email: h.email, phone: h.phone_number, bookings: 0, joined: b.created_at };
+    if (k && !seen[k]) seen[k] = { name: h.full_name, email: h.email, phone: h.phone_number, bookings: 0, joined: createdAt };
     if (k) seen[k].bookings++;
   });
   const users = Object.values(seen).sort((a,b) => b.bookings - a.bookings);
@@ -997,7 +997,7 @@ function showBookingDetail(b) {
       <div class="detail-item"><div class="label">Email</div><div class="value">${holder.email || b.email || '—'}</div></div>
       <div class="detail-item"><div class="label">Phone</div><div class="value">${holder.phone_number || b.phone || '—'}</div></div>
       <div class="detail-item"><div class="label">Total Amount</div><div class="value" style="color:var(--gold);font-size:1.1rem;">$${Number(b.total_amount_usd||b.amount_paid||0).toLocaleString()}</div></div>
-      <div class="detail-item"><div class="label">Created At</div><div class="value">${b.created_at ? new Date(b.created_at).toLocaleString() : '—'}</div></div>
+      <div class="detail-item"><div class="label">Created At</div><div class="value">${createdAt ? new Date(createdAt).toLocaleString() : '—'}</div></div>
       <div class="detail-item"><div class="label">Status</div><div class="value"><span class="badge ${b.status||'pending'}">${b.status||'pending'}</span></div></div>
       <div class="detail-item"><div class="label">Payment</div><div class="value"><span class="badge ${b.payment_status==='paid'?'paid':'unpaid'}">${b.payment_status||'pending'}</span></div></div>
     </div>

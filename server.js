@@ -27,64 +27,64 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL missing");
 }
 
-// const sequelize = new Sequelize(process.env.DATABASE_URL, {  
-//   dialect: 'postgres',
-//   protocol: 'postgres',
-//   dialectOptions: {
-//     ssl: {
-//       require: true,
-//       rejectUnauthorized: false
-//     }
-//   }
-// });
+const sequelize = new Sequelize(process.env.DATABASE_URL, {  
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
+});
 
-// sequelize.authenticate()
-// .then(() => {
-//   console.log('PostgreSQL Connected');
-// })
-// .catch((err) => {
-//   console.log(err);
-// });
-
-
+sequelize.authenticate()
+.then(() => {
+  console.log('PostgreSQL Connected');
+})
+.catch((err) => {
+  console.log(err);
+});
 
 
-// const Booking = sequelize.define('Booking', {
-
-//   booking_id: {
-//     type: DataTypes.STRING,
-//     allowNull: false
-//   },
-
-//   park_name: DataTypes.STRING,
-
-//   visit_date: DataTypes.STRING,
-
-//   entry_time: DataTypes.STRING,
-
-//   full_name: DataTypes.STRING,
-
-//   email: DataTypes.STRING,
-
-//   phone_number: DataTypes.STRING,
-
-//   total_amount_usd: DataTypes.FLOAT,
-
-//   payment_status: DataTypes.STRING,
-
-//   status: DataTypes.STRING,
-
-//   payment_id: DataTypes.STRING,
-
-//   booking_reference: DataTypes.STRING
-
-// });
 
 
-// sequelize.sync({ alter: true })
-// .then(() => {
-//   console.log('Database Synced');
-// });
+const Booking = sequelize.define('Booking', {
+
+  booking_id: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+
+  park_name: DataTypes.STRING,
+
+  visit_date: DataTypes.STRING,
+
+  entry_time: DataTypes.STRING,
+
+  full_name: DataTypes.STRING,
+
+  email: DataTypes.STRING,
+
+  phone_number: DataTypes.STRING,
+
+  total_amount_usd: DataTypes.FLOAT,
+
+  payment_status: DataTypes.STRING,
+
+  status: DataTypes.STRING,
+
+  payment_id: DataTypes.STRING,
+
+  booking_reference: DataTypes.STRING
+
+});
+
+
+sequelize.sync({ alter: true })
+.then(() => {
+  console.log('Database Synced');
+});
 
 
 
@@ -402,31 +402,47 @@ app.post('/api/v1/auth/register', (req, res) => {
 // });
 
 
-app.post('/api/v1/bookings', (req, res) => {
+app.post('/api/v1/bookings', async (req, res) => {
 
-  const data = req.body;
+  try {
 
-  const id = 'WE-' + Date.now();
+    const data = req.body;
 
-  bookings[id] = {
-    booking_id: id,
-    park_name: data.park_name,
-    visit_date: data.visit_date,
-    full_name: data.booking_holder?.full_name,
-    email: data.booking_holder?.email,
-    phone_number: data.booking_holder?.phone_number,
-    payment_status: "paid",
-    status: "confirmed",
-    amount_paid: data.total_amount_usd || 100,
-    total_amount_usd: data.total_amount_usd || 100,
-    created_at: new Date().toISOString(),
-    booking_holder: data.booking_holder
-  };
+    const id = 'WE-' + Date.now().toString(36).toUpperCase();
 
-  res.json({
-    success: true,
-    booking: bookings[id]
-  });
+    const booking = await Booking.create({
+
+      booking_id: id,
+      park_name: data.park_name,
+      visit_date: data.visit_date,
+      entry_time: data.entry_time,
+
+      full_name: data.booking_holder?.full_name,
+      email: data.booking_holder?.email,
+      phone_number: data.booking_holder?.phone_number,
+
+      total_amount_usd: data.total_amount_usd,
+
+      payment_status: "paid",
+      status: "confirmed"
+
+    });
+
+    res.status(201).json({
+      success: true,
+      booking
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
 
 });
 
@@ -479,13 +495,45 @@ app.get('/api/v1/bookings/:id', (req, res) => {
 
 
 // DELETE /api/v1/bookings/:id
-app.delete('/api/v1/bookings/:id', (req, res) => {
-  const booking = bookings[req.params.id];
-  if (!booking) return res.status(404).json({ detail: 'Booking not found' });
-  booking.status       = 'cancelled';
-  booking.cancelled_at = new Date().toISOString();
-  console.log(`[BOOKING] Cancelled: ${req.params.id}`);
-  res.json({ success: true, message: 'Booking cancelled', booking });
+app.delete('/api/v1/bookings/:id', async (req, res) => {
+
+  try {
+
+    const booking = await Booking.findOne({
+      where: {
+        booking_id: req.params.id
+      }
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        detail: 'Booking not found'
+      });
+    }
+
+    booking.status = 'cancelled';
+
+    await booking.save();
+
+    console.log(`[BOOKING] Cancelled: ${req.params.id}`);
+
+    res.json({
+      success: true,
+      message: 'Booking cancelled',
+      booking
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
+
 });
 
 // POST /api/v1/bookings/cancel
@@ -526,8 +574,8 @@ app.post('/api/v1/payments/confirm', (req, res) => {
 // ══════════════════════════════════════════════════════════════
 
 // GET /api/v1/admin/stats
-app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
-  const allBookings = Object.values(bookings);
+app.get('/api/v1/admin/stats', adminAuth, async (req, res) => {
+  const allBookings = await Booking.findAll();
   const uniqueIds   = new Set();
   const deduped     = allBookings.filter(b => {
     if (uniqueIds.has(b.booking_id)) return false;
@@ -553,7 +601,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
   // Daily bookings (last 30 days)
   const dailyMap = {};
   deduped.forEach(b => {
-    const day = (b.created_at || '').split('T')[0];
+const day = (b.createdAt || '').split('T')[0];
     if (!day) return;
     if (!dailyMap[day]) dailyMap[day] = { bookings: 0, revenue: 0 };
     dailyMap[day].bookings++;
@@ -562,7 +610,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
 
   // Recent bookings (last 10)
   const recent = deduped
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 10)
     .map(b => ({
       booking_id     : b.booking_id,
@@ -574,7 +622,7 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
       status         : b.status,
       payment_status : b.payment_status,
       visit_date     : b.visit_date,
-      created_at     : b.created_at,
+created_at     : b.createdAt,
       passengers     : b.passengers?.length || 0,
     }));
 
@@ -594,17 +642,19 @@ app.get('/api/v1/admin/stats', adminAuth, (req, res) => {
 });
 
 // GET /api/v1/admin/bookings — full list with filters
-app.get('/api/v1/admin/bookings', adminAuth, (req, res) => {
-  const { status, park, page = 1, limit = 50 } = req.query;
+app.get('/api/v1/admin/bookings', adminAuth, async (req, res) => {
+    const { status, park, page = 1, limit = 50 } = req.query;
   const uniqueIds = new Set();
-  let list = Object.values(bookings).filter(b => {
+  let list = await Booking.findAll();
+
+list = list.map(b => b.toJSON()).filter(b => {
     if (uniqueIds.has(b.booking_id)) return false;
     uniqueIds.add(b.booking_id);
     return true;
-  });
+});
   if (status) list = list.filter(b => b.status === status);
   if (park)   list = list.filter(b => (b.park_name||'').toLowerCase().includes(park.toLowerCase()));
-  list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const total  = list.length;
   const offset = (Number(page) - 1) * Number(limit);
   res.json({ total, page: Number(page), limit: Number(limit), bookings: list.slice(offset, offset + Number(limit)) });
