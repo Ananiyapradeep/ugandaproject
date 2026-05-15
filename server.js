@@ -106,7 +106,12 @@ sequelize.sync({ alter: true })
 
 
 app.use(cors({
-  origin: "https://ugandaproject.vercel.app"
+  origin: [
+    "https://ugandaproject.vercel.app",
+    "http://localhost:3000"
+  ],
+  methods: ['GET','POST','PUT','DELETE'],
+  credentials: true
 }));
 
 const client = twilio(
@@ -360,11 +365,55 @@ app.post('/api/v1/bookings', async (req, res) => {
 });
 
 // GET /api/v1/bookings/:id
-app.get('/api/v1/bookings/:id', (req, res) => {
-  const booking = bookings[req.params.id];
-  if (!booking) return res.status(404).json({ detail: 'Booking not found' });
-  res.json(booking);
+// app.get('/api/v1/bookings/:id', (req, res) => {
+//   const booking = bookings[req.params.id];
+//   if (!booking) return res.status(404).json({ detail: 'Booking not found' });
+//   res.json(booking);
+// });
+
+
+
+
+app.get('/api/v1/bookings/:id', async (req, res) => {
+
+  try {
+
+    const booking = await Booking.findOne({
+      where: {
+        booking_id: req.params.id
+      }
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        detail: 'Booking not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      booking
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
+
 });
+
+
+
+
+
+
+
 
 // DELETE /api/v1/bookings/:id
 app.delete('/api/v1/bookings/:id', (req, res) => {
