@@ -132,6 +132,7 @@ bookings["demo1"] = {
   status: "confirmed",
   payment_status: "paid",
   amount_paid: 120,
+  total_amount_inr: 120,
   created_at: new Date().toISOString(),
   booking_holder: {
     full_name: "Demo User",
@@ -146,6 +147,7 @@ bookings["demo2"] = {
   status: "confirmed",
   payment_status: "paid",
   amount_paid: 220,
+  total_amount_inr: 120,
   created_at: new Date().toISOString(),
   booking_holder: {
     full_name: "John Visitor",
