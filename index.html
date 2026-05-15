@@ -4707,16 +4707,23 @@ handler: async function (response) {
     console.log("Razorpay Response:", response);
 
     const saveBooking = {
-      booking_id: bookingData.bookingId,
-      park_name: bookingData.park?.name || "",
-      visit_date: bookingData.visitDate || "",
-      entry_time: bookingData.visitTime || "",
-      total_amount_usd: bookingData.total || 0,
-      payment_status: "paid",
-      status: "confirmed",
-      payment_id: response.razorpay_payment_id,
-      booking_reference: bookingData.bookingId
-    };
+  booking_id: bookingData.bookingId,
+  park_name: bookingData.park?.name || "",
+  visit_date: bookingData.visitDate || "",
+  entry_time: bookingData.visitTime || "",
+
+  full_name: bookingData.fullName || "",
+  email: bookingData.email || "",
+  phone_number: bookingData.phone || "",
+
+  total_amount_usd: bookingData.total || 0,
+
+  payment_status: "paid",
+  status: "confirmed",
+
+  payment_id: response.razorpay_payment_id,
+  booking_reference: bookingData.bookingId
+};
 
 await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {      method: "POST",
       headers: {
@@ -4725,7 +4732,7 @@ await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {     
       body: JSON.stringify(saveBooking)
     });
 
-    window.location.href = "/";
+    window.location.href = "/success.html";
 
   } catch(error){
 
@@ -4800,24 +4807,23 @@ function simulatePaymentDemo(btn){
     const txnId = 'TXN-DEMO-' + Date.now().toString(36).toUpperCase();
 
     const saveBooking = {
-      booking_id: bookingData.bookingId,
-      park_name: bookingData.park?.name || "",
-      visit_date: bookingData.visitDate || "",
-      entry_time: bookingData.visitTime || "",
+  booking_id: bookingData.bookingId,
+  park_name: bookingData.park?.name || "",
+  visit_date: bookingData.visitDate || "",
+  entry_time: bookingData.visitTime || "",
 
-      booking_holder: {
-        full_name: bookingData.holderName || "",
-        email: bookingData.email || "",
-        phone_number: bookingData.phone || "",
-        id_type: bookingData.idType || "passport"
-      },
+  full_name: bookingData.fullName || "",
+  email: bookingData.email || "",
+  phone_number: bookingData.phone || "",
 
-      total_amount_usd: bookingData.total || 0,
-      payment_status: "paid",
-      status: "confirmed",
-      payment_id: txnId,
-      booking_reference: bookingData.bookingId
-    };
+  total_amount_usd: bookingData.total || 0,
+
+  payment_status: "paid",
+  status: "confirmed",
+
+  payment_id: response.razorpay_payment_id,
+  booking_reference: bookingData.bookingId
+};
 
 fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {
         method: "POST",
