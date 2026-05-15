@@ -604,7 +604,7 @@ app.get('/api/v1/admin/stats', adminAuth, async (req, res) => {
   // Daily bookings (last 30 days)
   const dailyMap = {};
   deduped.forEach(b => {
-const day = (b.createdAt || '').split('T')[0];
+const day = new Date(b.createdAt).toISOString().split('T')[0];
     if (!day) return;
     if (!dailyMap[day]) dailyMap[day] = { bookings: 0, revenue: 0 };
     dailyMap[day].bookings++;
