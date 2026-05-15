@@ -11,7 +11,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 
 
 
-
 const express  = require('express');
 const cors     = require('cors');
 const path     = require('path');
@@ -23,9 +22,9 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL missing");
-}
+// if (!process.env.DATABASE_URL) {
+//   throw new Error("DATABASE_URL missing");
+// }
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {  
   dialect: 'postgres',
@@ -124,7 +123,7 @@ const serviceSid = process.env.TWILIO_SERVICE_SID;
 
 // ── In-memory stores ──────────────────────────────────────────
 const users    = {};   // identifier → user object
-const bookings = {};   // booking_id → booking object
+// const bookings = {};   // booking_id → booking object
 
 // bookings["demo1"] = {
 //   booking_id: "WE-DEMO-001",
@@ -339,69 +338,6 @@ app.post('/api/v1/auth/register', (req, res) => {
 // BOOKING ENDPOINTS
 // ══════════════════════════════════════════════════════════════
 
-// POST /api/v1/bookings
-// app.post('/api/v1/bookings', async (req, res) => {
-
-//   try {
-
-//     const data = req.body;
-
-//     const id = 'WE-' + Date.now().toString(36).toUpperCase();
-
-//     const booking = await Booking.create({
-
-//       booking_id: id,
-
-//       park_name: data.park_name,
-
-//       visit_date: data.visit_date,
-
-//       entry_time: data.entry_time,
-
-//       full_name: data.booking_holder?.full_name,
-
-//       email: data.booking_holder?.email,
-
-//       phone_number: data.booking_holder?.phone_number,
-
-//       total_amount_usd: data.total_amount_usd,
-
-//       payment_status: data.payment_status,
-
-//       status: data.status,
-
-//       payment_id: data.payment_id,
-
-//       booking_reference: data.booking_reference
-
-//     });
-
-//     res.status(201).json({
-//       success: true,
-//       booking
-//     });
-
-//   } catch(err) {
-
-//     console.log(err);
-
-//     res.status(500).json({
-//       success: false,
-//       error: err.message
-//     });
-
-//   }
-
-// });
-
-// GET /api/v1/bookings/:id
-// app.get('/api/v1/bookings/:id', (req, res) => {
-//   const booking = bookings[req.params.id];
-//   if (!booking) return res.status(404).json({ detail: 'Booking not found' });
-//   res.json(booking);
-// });
-
-
 app.post('/api/v1/bookings', async (req, res) => {
 
   try {
@@ -413,18 +349,28 @@ app.post('/api/v1/bookings', async (req, res) => {
     const booking = await Booking.create({
 
       booking_id: id,
+
       park_name: data.park_name,
+
       visit_date: data.visit_date,
+
       entry_time: data.entry_time,
 
       full_name: data.booking_holder?.full_name,
+
       email: data.booking_holder?.email,
+
       phone_number: data.booking_holder?.phone_number,
 
       total_amount_usd: data.total_amount_usd,
 
-      payment_status: "paid",
-      status: "confirmed"
+      payment_status: data.payment_status,
+
+      status: data.status,
+
+      payment_id: data.payment_id,
+
+      booking_reference: data.booking_reference
 
     });
 
@@ -446,30 +392,68 @@ app.post('/api/v1/bookings', async (req, res) => {
 
 });
 
-app.get('/api/v1/bookings/:id', (req, res) => {
-  res.json({
-    success: true,
-    message: "Booking lookup temporarily disabled"
-  });
+app.get('/api/v1/bookings/:id', async (req, res) => {
+
+  try {
+
+    const booking = await Booking.findOne({
+      where: {
+        booking_id: req.params.id
+      }
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        detail: 'Booking not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      booking
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
+
 });
 
-// app.get('/api/v1/bookings/:id', async (req, res) => {
+
+// app.post('/api/v1/bookings', async (req, res) => {
 
 //   try {
 
-//     const booking = await Booking.findOne({
-//       where: {
-//         booking_id: req.params.id
-//       }
+//     const data = req.body;
+
+//     const id = 'WE-' + Date.now().toString(36).toUpperCase();
+
+//     const booking = await Booking.create({
+
+//       booking_id: id,
+//       park_name: data.park_name,
+//       visit_date: data.visit_date,
+//       entry_time: data.entry_time,
+
+//       full_name: data.booking_holder?.full_name,
+//       email: data.booking_holder?.email,
+//       phone_number: data.booking_holder?.phone_number,
+
+//       total_amount_usd: data.total_amount_usd,
+
+//       payment_status: "paid",
+//       status: "confirmed"
+
 //     });
 
-//     if (!booking) {
-//       return res.status(404).json({
-//         detail: 'Booking not found'
-//       });
-//     }
-
-//     res.json({
+//     res.status(201).json({
 //       success: true,
 //       booking
 //     });
@@ -489,33 +473,35 @@ app.get('/api/v1/bookings/:id', (req, res) => {
 
 
 
+ 
 
-
-
-
-
-// DELETE /api/v1/bookings/:id
-app.delete('/api/v1/bookings/:id', async (req, res) => {
+// POST /api/v1/bookings/cancel
+app.post('/api/v1/bookings/cancel', async (req, res) => {
 
   try {
 
+    const { booking_reference, ticket_id, cancellation_reason } = req.body;
+
+    const id = booking_reference || ticket_id;
+
     const booking = await Booking.findOne({
       where: {
-        booking_id: req.params.id
+        booking_id: id
       }
     });
 
     if (!booking) {
       return res.status(404).json({
-        detail: 'Booking not found'
+        success: false,
+        message: 'Booking not found'
       });
     }
 
     booking.status = 'cancelled';
+    booking.cancellation_reason = cancellation_reason || 'Visitor request';
+    booking.cancelled_at = new Date().toISOString();
 
     await booking.save();
-
-    console.log(`[BOOKING] Cancelled: ${req.params.id}`);
 
     res.json({
       success: true,
@@ -536,37 +522,55 @@ app.delete('/api/v1/bookings/:id', async (req, res) => {
 
 });
 
-// POST /api/v1/bookings/cancel
-app.post('/api/v1/bookings/cancel', (req, res) => {
-  const { booking_reference, ticket_id, cancellation_reason } = req.body;
-  const id      = booking_reference || ticket_id;
-  const booking = bookings[id];
-  if (!booking) return res.json({ success: true, message: 'Cancellation recorded', id });
-  booking.status               = 'cancelled';
-  booking.cancellation_reason  = cancellation_reason || 'Visitor request';
-  booking.cancelled_at         = new Date().toISOString();
-  console.log(`[BOOKING] Cancelled: ${id}`);
-  res.json({ success: true, message: 'Booking cancelled', booking });
-});
-
 // ══════════════════════════════════════════════════════════════
 // PAYMENT ENDPOINTS
 // ══════════════════════════════════════════════════════════════
 
 // POST /api/v1/payments/confirm
-app.post('/api/v1/payments/confirm', (req, res) => {
-  const { booking_id, payment_id, amount_paid, currency, payment_method, status } = req.body;
-  const booking = bookings[booking_id];
-  if (booking) {
-    booking.payment_status = status || 'paid';
-    booking.payment_id     = payment_id;
-    booking.amount_paid    = amount_paid;
-    booking.currency       = currency || 'USD';
-    booking.paid_at        = new Date().toISOString();
-    booking.status         = 'confirmed';
+app.post('/api/v1/payments/confirm', async (req, res) => {
+
+  try {
+
+    const {
+      booking_id,
+      payment_id,
+      amount_paid,
+      currency,
+      status
+    } = req.body;
+
+    const booking = await Booking.findOne({
+      where: {
+        booking_id
+      }
+    });
+
+    if (booking) {
+
+      booking.payment_status = status || 'paid';
+      booking.payment_id = payment_id;
+      booking.total_amount_usd = amount_paid;
+      booking.status = 'confirmed';
+
+      await booking.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Payment confirmed'
+    });
+
+  } catch(err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
   }
-  console.log(`[PAYMENT] ✓ Confirmed — Booking: ${booking_id} | Txn: ${payment_id} | $${amount_paid}`);
-  res.json({ success: true, message: 'Payment confirmed', payment_id, booking_id });
+
 });
 
 // ══════════════════════════════════════════════════════════════
@@ -615,9 +619,9 @@ const day = (b.createdAt || '').split('T')[0];
     .map(b => ({
       booking_id     : b.booking_id,
       park_name      : b.park_name,
-      holder_name    : b.booking_holder?.full_name || '—',
-      email          : b.booking_holder?.email || '—',
-      phone          : b.booking_holder?.phone_number || '—',
+      holder_name : b.full_name || '—',
+email       : b.email || '—',
+phone       : b.phone_number || '—',
       total_usd      : b.total_amount_usd || b.amount_paid || 0,
       status         : b.status,
       payment_status : b.payment_status,
@@ -663,32 +667,34 @@ list = list.map(b => b.toJSON()).filter(b => {
 // ══════════════════════════════════════════════════════════════
 // HEALTH
 // ══════════════════════════════════════════════════════════════
-app.get('/health', (req, res) => {
-  res.json({
-    status   : 'ok',
-    bookings : Object.keys(bookings).length,
-    users    : Object.keys(users).length,
-otp_mode : 'Twilio Verify SMS',  });
+app.get('/health', async (req, res) => {
+
+  try {
+
+    const totalBookings = await Booking.count();
+
+    res.json({
+      status: 'ok',
+      bookings: totalBookings,
+      users: Object.keys(users).length,
+      otp_mode: 'Twilio Verify SMS'
+    });
+
+  } catch(err) {
+
+    res.status(500).json({
+      status: 'error',
+      error: err.message
+    });
+
+  }
+
 });
 
 
-if (process.env.NODE_ENV !== 'production') {
-
-
-app.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    message: "Server Running"
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
-
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-
-}
-
 module.exports = app;
 
 
