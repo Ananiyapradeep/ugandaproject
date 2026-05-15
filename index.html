@@ -2591,7 +2591,7 @@ overflow:hidden;
 // Auto-discovers endpoints from /openapi.json on load
 // Falls back gracefully to demo mode if API is unreachable
 // ============================================================
-const API_BASE = 'https://theshowapi.doteontechnologies.com';
+const API_BASE = 'https://ugandaproject-backend.onrender.com';
 let API_SPEC   = null;
 let API_ONLINE = false;
 let API_TOKEN  = null;
@@ -4718,8 +4718,7 @@ handler: async function (response) {
       booking_reference: bookingData.bookingId
     };
 
-    await fetch("/api/v1/bookings", {
-      method: "POST",
+await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
@@ -4820,8 +4819,8 @@ function simulatePaymentDemo(btn){
       booking_reference: bookingData.bookingId
     };
 
-    fetch("/api/v1/bookings", {
-      method: "POST",
+fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {
+        method: "POST",
       headers: {
         "Content-Type": "application/json"
       },

@@ -179,7 +179,6 @@ const CONFIG = {
 // ══════════════════════════════════════════════════════════════
 // MIDDLEWARE
 // ══════════════════════════════════════════════════════════════
-app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['*'] }));
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
