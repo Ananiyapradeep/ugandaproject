@@ -403,10 +403,31 @@ app.post('/api/v1/auth/register', (req, res) => {
 
 
 app.post('/api/v1/bookings', (req, res) => {
+
+  const data = req.body;
+
+  const id = 'WE-' + Date.now();
+
+  bookings[id] = {
+    booking_id: id,
+    park_name: data.park_name,
+    visit_date: data.visit_date,
+    full_name: data.booking_holder?.full_name,
+    email: data.booking_holder?.email,
+    phone_number: data.booking_holder?.phone_number,
+    payment_status: "paid",
+    status: "confirmed",
+    amount_paid: data.total_amount_usd || 100,
+    total_amount_inr: data.total_amount_usd || 100,
+    created_at: new Date().toISOString(),
+    booking_holder: data.booking_holder
+  };
+
   res.json({
     success: true,
-    message: "Booking temporarily disabled"
+    booking: bookings[id]
   });
+
 });
 
 app.get('/api/v1/bookings/:id', (req, res) => {
