@@ -126,6 +126,34 @@ const serviceSid = process.env.TWILIO_SERVICE_SID;
 const users    = {};   // identifier → user object
 const bookings = {};   // booking_id → booking object
 
+bookings["demo1"] = {
+  booking_id: "WE-DEMO-001",
+  park_name: "Bwindi Forest",
+  status: "confirmed",
+  payment_status: "paid",
+  amount_paid: 120,
+  created_at: new Date().toISOString(),
+  booking_holder: {
+    full_name: "Demo User",
+    email: "demo@test.com",
+    phone_number: "+911234567890"
+  }
+};
+
+bookings["demo2"] = {
+  booking_id: "WE-DEMO-002",
+  park_name: "Queen Elizabeth Park",
+  status: "confirmed",
+  payment_status: "paid",
+  amount_paid: 220,
+  created_at: new Date().toISOString(),
+  booking_holder: {
+    full_name: "John Visitor",
+    email: "john@test.com",
+    phone_number: "+911111111111"
+  }
+};
+
 // ══════════════════════════════════════════════════════════════
 // OTP DELIVERY CONFIG
 // Set these via environment variables or edit below directly
