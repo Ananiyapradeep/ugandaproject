@@ -49,36 +49,36 @@ if (!process.env.DATABASE_URL) {
 
 
 
-const Booking = sequelize.define('Booking', {
+// const Booking = sequelize.define('Booking', {
 
-  booking_id: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
+//   booking_id: {
+//     type: DataTypes.STRING,
+//     allowNull: false
+//   },
 
-  park_name: DataTypes.STRING,
+//   park_name: DataTypes.STRING,
 
-  visit_date: DataTypes.STRING,
+//   visit_date: DataTypes.STRING,
 
-  entry_time: DataTypes.STRING,
+//   entry_time: DataTypes.STRING,
 
-  full_name: DataTypes.STRING,
+//   full_name: DataTypes.STRING,
 
-  email: DataTypes.STRING,
+//   email: DataTypes.STRING,
 
-  phone_number: DataTypes.STRING,
+//   phone_number: DataTypes.STRING,
 
-  total_amount_usd: DataTypes.FLOAT,
+//   total_amount_usd: DataTypes.FLOAT,
 
-  payment_status: DataTypes.STRING,
+//   payment_status: DataTypes.STRING,
 
-  status: DataTypes.STRING,
+//   status: DataTypes.STRING,
 
-  payment_id: DataTypes.STRING,
+//   payment_id: DataTypes.STRING,
 
-  booking_reference: DataTypes.STRING
+//   booking_reference: DataTypes.STRING
 
-});
+// });
 
 
 // sequelize.sync({ alter: true })
@@ -310,59 +310,59 @@ app.post('/api/v1/auth/register', (req, res) => {
 // ══════════════════════════════════════════════════════════════
 
 // POST /api/v1/bookings
-app.post('/api/v1/bookings', async (req, res) => {
+// app.post('/api/v1/bookings', async (req, res) => {
 
-  try {
+//   try {
 
-    const data = req.body;
+//     const data = req.body;
 
-    const id = 'WE-' + Date.now().toString(36).toUpperCase();
+//     const id = 'WE-' + Date.now().toString(36).toUpperCase();
 
-    const booking = await Booking.create({
+//     const booking = await Booking.create({
 
-      booking_id: id,
+//       booking_id: id,
 
-      park_name: data.park_name,
+//       park_name: data.park_name,
 
-      visit_date: data.visit_date,
+//       visit_date: data.visit_date,
 
-      entry_time: data.entry_time,
+//       entry_time: data.entry_time,
 
-      full_name: data.booking_holder?.full_name,
+//       full_name: data.booking_holder?.full_name,
 
-      email: data.booking_holder?.email,
+//       email: data.booking_holder?.email,
 
-      phone_number: data.booking_holder?.phone_number,
+//       phone_number: data.booking_holder?.phone_number,
 
-      total_amount_usd: data.total_amount_usd,
+//       total_amount_usd: data.total_amount_usd,
 
-      payment_status: data.payment_status,
+//       payment_status: data.payment_status,
 
-      status: data.status,
+//       status: data.status,
 
-      payment_id: data.payment_id,
+//       payment_id: data.payment_id,
 
-      booking_reference: data.booking_reference
+//       booking_reference: data.booking_reference
 
-    });
+//     });
 
-    res.status(201).json({
-      success: true,
-      booking
-    });
+//     res.status(201).json({
+//       success: true,
+//       booking
+//     });
 
-  } catch(err) {
+//   } catch(err) {
 
-    console.log(err);
+//     console.log(err);
 
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
+//     res.status(500).json({
+//       success: false,
+//       error: err.message
+//     });
 
-  }
+//   }
 
-});
+// });
 
 // GET /api/v1/bookings/:id
 // app.get('/api/v1/bookings/:id', (req, res) => {
@@ -372,41 +372,53 @@ app.post('/api/v1/bookings', async (req, res) => {
 // });
 
 
-
-
-app.get('/api/v1/bookings/:id', async (req, res) => {
-
-  try {
-
-    const booking = await Booking.findOne({
-      where: {
-        booking_id: req.params.id
-      }
-    });
-
-    if (!booking) {
-      return res.status(404).json({
-        detail: 'Booking not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      booking
-    });
-
-  } catch(err) {
-
-    console.log(err);
-
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-
-  }
-
+app.post('/api/v1/bookings', (req, res) => {
+  res.json({
+    success: true,
+    message: "Booking temporarily disabled"
+  });
 });
+
+app.get('/api/v1/bookings/:id', (req, res) => {
+  res.json({
+    success: true,
+    message: "Booking lookup temporarily disabled"
+  });
+});
+
+// app.get('/api/v1/bookings/:id', async (req, res) => {
+
+//   try {
+
+//     const booking = await Booking.findOne({
+//       where: {
+//         booking_id: req.params.id
+//       }
+//     });
+
+//     if (!booking) {
+//       return res.status(404).json({
+//         detail: 'Booking not found'
+//       });
+//     }
+
+//     res.json({
+//       success: true,
+//       booking
+//     });
+
+//   } catch(err) {
+
+//     console.log(err);
+
+//     res.status(500).json({
+//       success: false,
+//       error: err.message
+//     });
+
+//   }
+
+// });
 
 
 
