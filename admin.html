@@ -664,7 +664,7 @@ td {
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
-const API_BASE     = window.location.origin;
+const API_BASE = 'https://ugandaproject-backend.onrender.com';
 const ADMIN_TOKEN  = sessionStorage.getItem('adminToken') || '';
 
 // ── STATE ─────────────────────────────────────────────────────
@@ -891,7 +891,11 @@ function goPage(p) { currentPage = p; renderBookingsTable(); }
 
 function bookingRow(b, showContact) {
   const d = b.visit_date || '—';
-const holder = b.booking_holder || {};
+const holder = {
+  full_name: b.full_name,
+  email: b.email,
+  phone_number: b.phone_number
+};
 const email = holder.email || '—';
 const phone = holder.phone_number || '—';
   const amount = b.total_usd || b.total_amount_usd || b.amount_paid || 0;
@@ -954,11 +958,26 @@ async function renderUsersTable() {
   // Users aren't directly exposed — show from bookings holder data
   const seen  = {};
   allBookings.forEach(b => {
-    const h = b.booking_holder || {};
-    const k = h.email || h.phone_number || h.full_name;
-    if (k && !seen[k]) seen[k] = { name: h.full_name, email: h.email, phone: h.phone_number, bookings: 0, joined: createdAt };
-    if (k) seen[k].bookings++;
-  });
+  const h = {
+    full_name: b.full_name,
+    email: b.email,
+    phone_number: b.phone_number
+  };
+
+  const k = h.email || h.phone_number || h.full_name;
+
+  if (k && !seen[k]) {
+    seen[k] = {
+      name: h.full_name,
+      email: h.email,
+      phone: h.phone_number,
+      bookings: 0,
+      joined: b.createdAt
+    };
+  }
+
+  if (k) seen[k].bookings++;
+});
   const users = Object.values(seen).sort((a,b) => b.bookings - a.bookings);
   if (!users.length) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><span class="icon">👤</span>No users yet</td></tr>`;
@@ -977,7 +996,11 @@ async function renderUsersTable() {
 
 // ── BOOKING DETAIL MODAL ──────────────────────────────────────
 function showBookingDetail(b) {
-  const holder = b.booking_holder || {};
+  const holder = {
+  full_name: b.full_name,
+  email: b.email,
+  phone_number: b.phone_number
+};
   const vehicles = b.vehicles || [];
   const activities = b.activities || [];
   const passengers = b.passengers || [];
@@ -997,7 +1020,7 @@ function showBookingDetail(b) {
       <div class="detail-item"><div class="label">Email</div><div class="value">${holder.email || b.email || '—'}</div></div>
       <div class="detail-item"><div class="label">Phone</div><div class="value">${holder.phone_number || b.phone || '—'}</div></div>
       <div class="detail-item"><div class="label">Total Amount</div><div class="value" style="color:var(--gold);font-size:1.1rem;">$${Number(b.total_amount_usd||b.amount_paid||0).toLocaleString()}</div></div>
-      <div class="detail-item"><div class="label">Created At</div><div class="value">${createdAt ? new Date(createdAt).toLocaleString() : '—'}</div></div>
+      <div class="detail-item"><div class="label">Created At</div><div class="value">${b.createdAt ? new Date(b.createdAt).toLocaleString() : '—'}</div></div>
       <div class="detail-item"><div class="label">Status</div><div class="value"><span class="badge ${b.status||'pending'}">${b.status||'pending'}</span></div></div>
       <div class="detail-item"><div class="label">Payment</div><div class="value"><span class="badge ${b.payment_status==='paid'?'paid':'unpaid'}">${b.payment_status||'pending'}</span></div></div>
     </div>
