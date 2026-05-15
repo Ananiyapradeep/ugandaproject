@@ -4706,15 +4706,18 @@ handler: async function (response) {
 
     console.log("Razorpay Response:", response);
 
+console.log("BOOKING DATA:", bookingData);
+alert(JSON.stringify(bookingData));
+
     const saveBooking = {
   booking_id: bookingData.bookingId,
   park_name: bookingData.park?.name || "",
   visit_date: bookingData.visitDate || "",
   entry_time: bookingData.visitTime || "",
 
-  full_name: bookingData.fullName || "",
-  email: bookingData.email || "",
-  phone_number: bookingData.phone || "",
+full_name: bookingData.booking_holder?.full_name || "",
+email: bookingData.booking_holder?.email || "",
+phone_number: bookingData.booking_holder?.phone_number || "",
 
   total_amount_usd: bookingData.total || 0,
 
@@ -4812,9 +4815,9 @@ function simulatePaymentDemo(btn){
   visit_date: bookingData.visitDate || "",
   entry_time: bookingData.visitTime || "",
 
-  full_name: bookingData.fullName || "",
-  email: bookingData.email || "",
-  phone_number: bookingData.phone || "",
+full_name: bookingData.booking_holder?.full_name || "",
+email: bookingData.booking_holder?.email || "",
+phone_number: bookingData.booking_holder?.phone_number || "",
 
   total_amount_usd: bookingData.total || 0,
 
