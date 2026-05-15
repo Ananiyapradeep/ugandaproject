@@ -27,24 +27,24 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL missing");
 }
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {  
-  dialect: 'postgres',
-  protocol: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
-  }
-});
+// const sequelize = new Sequelize(process.env.DATABASE_URL, {  
+//   dialect: 'postgres',
+//   protocol: 'postgres',
+//   dialectOptions: {
+//     ssl: {
+//       require: true,
+//       rejectUnauthorized: false
+//     }
+//   }
+// });
 
-sequelize.authenticate()
-.then(() => {
-  console.log('PostgreSQL Connected');
-})
-.catch((err) => {
-  console.log(err);
-});
+// sequelize.authenticate()
+// .then(() => {
+//   console.log('PostgreSQL Connected');
+// })
+// .catch((err) => {
+//   console.log(err);
+// });
 
 
 
@@ -81,10 +81,10 @@ const Booking = sequelize.define('Booking', {
 });
 
 
-sequelize.sync({ alter: true })
-.then(() => {
-  console.log('Database Synced');
-});
+// sequelize.sync({ alter: true })
+// .then(() => {
+//   console.log('Database Synced');
+// });
 
 
 
