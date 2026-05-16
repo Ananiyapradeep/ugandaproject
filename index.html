@@ -4728,14 +4728,17 @@ phone_number: bookingData.booking_holder?.phone_number || "",
   booking_reference: bookingData.bookingId
 };
 
-await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {      method: "POST",
+await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", { 
+       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(saveBooking)
     });
 
-    window.location.href = "/success.html";
+alert("Booking Confirmed Successfully!");
+window.location.href = "/";
+
 
   } catch(error){
 
