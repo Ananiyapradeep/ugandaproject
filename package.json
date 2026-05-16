@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "vercel-build": "npm install"
+   
   },
   "dependencies": {
     "cors": "^2.8.6",
