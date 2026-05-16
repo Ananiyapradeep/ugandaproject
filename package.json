@@ -21,4 +21,9 @@
     "sequelize": "^6.37.8",
     "twilio": "^6.0.2"
   }
+
+"scripts": {
+  "start": "node server.js",
+  "vercel-build": "npm install"
+}
 }
