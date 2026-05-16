@@ -2591,7 +2591,7 @@ overflow:hidden;
 // Auto-discovers endpoints from /openapi.json on load
 // Falls back gracefully to demo mode if API is unreachable
 // ============================================================
-const API_BASE = 'https://ugandaproject-backend.onrender.com';
+const API_BASE = window.location.origin;
 let API_SPEC   = null;
 let API_ONLINE = false;
 let API_TOKEN  = null;
@@ -2758,7 +2758,14 @@ function showAPIDebug(){
 // AUTH API CALLS
 // ============================================================
 async function apiSendOTP(identifier){
-  if(!API_ONLINE) return null;
+  if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const isPhone = /^\+?\d[\d\s\-]{6,}$/.test(identifier);
   const payload = isPhone ? { phone_number: identifier } : { email: identifier };
   const route = resolveEndpoint('post', ['/auth/send-otp','/otp/send','/auth/otp','/users/send-otp','/api/v1/auth/send-otp']);
@@ -2767,7 +2774,14 @@ async function apiSendOTP(identifier){
 }
 
 async function apiVerifyOTP(identifier, otp){
-  if(!API_ONLINE) return null;
+  if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const isPhone = /^\+?\d[\d\s\-]{6,}$/.test(identifier);
   const payload = isPhone ? { phone_number: identifier, otp } : { email: identifier, otp };
   const route = resolveEndpoint('post', ['/auth/verify-otp','/otp/verify','/auth/verify','/users/verify-otp','/api/v1/auth/verify-otp']);
@@ -2781,7 +2795,14 @@ async function apiVerifyOTP(identifier, otp){
 }
 
 async function apiRegister(payload){
-  if(!API_ONLINE) return null;
+  if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const route = resolveEndpoint('post', ['/auth/register','/users/register','/auth/signup','/register','/api/v1/auth/register']);
   if(!route) return null;
   return api('POST', route, payload);
@@ -2827,7 +2848,14 @@ status: 'confirmed',
 }
 
 async function apiCreateBooking(data){
-  if(!API_ONLINE) return null;
+  if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const payload = buildBookingPayload(data);
   const route = resolveEndpoint('post', ['/bookings/create','/booking/create','/park-bookings','/bookings','/api/bookings','/api/v1/bookings']);
   if(!route){ console.warn('[WildEye] No booking endpoint found'); return null; }
@@ -2845,7 +2873,14 @@ async function apiCreateBooking(data){
 }
 
 async function apiConfirmPayment(bookingId, paymentId, amount){
-  if(!API_ONLINE) return null;
+  if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const payload = { booking_id: bookingId, payment_id: paymentId, amount_paid: amount, currency: 'USD', payment_method: 'razorpay', status: 'paid' };
   const route = resolveEndpoint('post', ['/payments/confirm','/payment/confirm','/bookings/payment','/api/v1/payments/confirm']);
   if(!route) return null;
@@ -2853,7 +2888,14 @@ async function apiConfirmPayment(bookingId, paymentId, amount){
 }
 
 async function apiCancelBooking(ticketId, reason='Visitor request'){
-  if(!API_ONLINE) return null;
+ if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const payload = { booking_reference: ticketId, ticket_id: ticketId, cancellation_reason: reason };
   const specRoute = resolveEndpoint('delete', ['/bookings/{id}','/tickets/{id}'])
     || resolveEndpoint('post', ['/bookings/cancel','/booking/cancel','/cancel','/tickets/cancel','/api/v1/bookings/cancel']);
@@ -2865,7 +2907,14 @@ async function apiCancelBooking(ticketId, reason='Visitor request'){
 }
 
 async function apiGetBooking(ticketId){
-  if(!API_ONLINE) return null;
+ if(!API_ONLINE){
+
+  console.error("API Server Offline");
+
+  alert("Server is currently offline. Please try again later.");
+
+  return;
+}
   const route = resolveEndpoint('get', ['/bookings/{id}','/tickets/{id}','/booking/{id}','/api/v1/bookings/{id}']);
   if(!route) return null;
   try { return await api('GET', route.replace('{id}', encodeURIComponent(ticketId))); } catch(e){ return null; }
@@ -4736,17 +4785,27 @@ await fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {
       body: JSON.stringify(saveBooking)
     });
 
-alert("Booking Confirmed Successfully!");
-window.location.href = "/";
+try {
 
+  const response = await saveBooking(data);
 
-  } catch(error){
+  if(response){
 
-    console.log(error);
+    alert("Booking Confirmed Successfully!");
+    showPaymentSuccess();
 
-    alert("Booking Save Failed");
+  } else {
 
+    alert("Booking Failed");
   }
+
+} catch(error){
+
+  console.error("Booking Error:", error);
+
+  alert(error.message || "Booking Save Failed. Please try again.");
+
+}
 
 },
 
@@ -4831,7 +4890,7 @@ phone_number: bookingData.booking_holder?.phone_number || "",
   booking_reference: bookingData.bookingId
 };
 
-fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {
+fetch("/api/v1/bookings") {
         method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -4851,12 +4910,12 @@ fetch("https://ugandaproject-backend.onrender.com/api/v1/bookings", {
       }
 
     })
-    .catch(err => {
-
-      console.error("Demo Booking Error:", err);
-
-    });
-
+   .catch(err => {
+  console.log(err);
+})
+.finally(() => {
+  showPaymentSuccess();
+});
   }, 2000);
 
 }
