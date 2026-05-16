@@ -103,9 +103,9 @@ sequelize.sync({ alter: true })
 
 
 
-
 app.use(cors({
   origin: [
+    "https://ugandaproject-main.vercel.app",
     "https://ugandaproject.vercel.app",
     "http://localhost:3000"
   ],
