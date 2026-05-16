@@ -4758,7 +4758,7 @@ handler: async function (response) {
 console.log("BOOKING DATA:", bookingData);
 alert(JSON.stringify(bookingData));
 
-    const saveBooking = {
+    const saveBooking = { = {
   booking_id: bookingData.bookingId,
   park_name: bookingData.park?.name || "",
   visit_date: bookingData.visitDate || "",
@@ -4773,7 +4773,7 @@ phone_number: bookingData.booking_holder?.phone_number || "",
   payment_status: "paid",
   status: "confirmed",
 
-  payment_id: response.razorpay_payment_id,
+  payment_id: txnId,
   booking_reference: bookingData.bookingId
 };
 
@@ -4807,7 +4807,7 @@ try {
 
 }
 
-},
+}
 
 
 
@@ -4871,7 +4871,7 @@ function simulatePaymentDemo(btn){
 
     const txnId = 'TXN-DEMO-' + Date.now().toString(36).toUpperCase();
 
-    const saveBooking = {
+    const bookingPayload = { = {
   booking_id: bookingData.bookingId,
   park_name: bookingData.park?.name || "",
   visit_date: bookingData.visitDate || "",
@@ -4886,11 +4886,11 @@ phone_number: bookingData.booking_holder?.phone_number || "",
   payment_status: "paid",
   status: "confirmed",
 
-  payment_id: response.razorpay_payment_id,
+  payment_id: txnId,
   booking_reference: bookingData.bookingId
 };
 
-fetch("/api/v1/bookings") {
+fetch("/api/v1/bookings",{
         method: "POST",
       headers: {
         "Content-Type": "application/json"
